@@ -1,4 +1,4 @@
-const { Product } = require("../models");
+const { Product } = require("../models/index");
 
 // Controller function to create a new product
 const createProduct = async (req, res) => {
