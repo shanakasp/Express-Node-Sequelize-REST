@@ -4,14 +4,22 @@ const { Product } = require("../models/index");
 const createProduct = async (req, res) => {
   try {
     const { name, price, description, published } = req.body;
-    const newProduct = await Product.create({
+
+    // Construct the product information object
+    const productInfo = {
       name,
       price,
       description,
-      published,
-    });
+      published: published ? published : false,
+    };
+
+    // Create a new product using the Product model
+    const newProduct = await Product.create(productInfo);
+
+    // Respond with the created product and HTTP status code 201 (Created)
     res.status(201).json(newProduct);
   } catch (error) {
+    // Handle errors by sending an error response with status code 500 (Internal Server Error)
     res
       .status(500)
       .json({ message: "Failed to create product", error: error.message });
