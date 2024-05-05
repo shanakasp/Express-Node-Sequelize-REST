@@ -7,7 +7,7 @@ const reviewModel = require("./reviewModel");
 const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
   host: dbConfig.HOST,
   dialect: dbConfig.dialect,
-  operatorsAliases: false,
+  logging: false, // Disable logging SQL queries (optional)
   pool: {
     max: dbConfig.pool.max,
     min: dbConfig.pool.min,
@@ -24,6 +24,7 @@ sequelize
   })
   .catch((error) => {
     console.error("Unable to connect to the database:", error);
+    process.exit(1); // Exit process on database connection failure
   });
 
 // Define database object to store Sequelize instance and models
@@ -36,9 +37,16 @@ const db = {
 db.products = productModel(sequelize, DataTypes);
 db.reviews = reviewModel(sequelize, DataTypes);
 
-db.sequelize.sync({ force: false }).then(() => {
-  console.log("Yes, re-sync Done");
-});
+// Sync models with the database (optional)
+sequelize
+  .sync({ force: false }) // Set force: true to drop and re-create tables on sync
+  .then(() => {
+    console.log("Database models synchronized.");
+  })
+  .catch((error) => {
+    console.error("Database synchronization error:", error);
+    process.exit(1); // Exit process on database synchronization error
+  });
 
 // Export the initialized Sequelize instance and models
 module.exports = db;
